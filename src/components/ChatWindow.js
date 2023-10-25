@@ -136,7 +136,7 @@ const ChatWindow = () => {
 
     // 使用useEffect来从后端获取用户数据
     useEffect(() => {
-        // 这里的URL应该是你的后端API的真实地址
+        // 这里的URL应该是后端API的真实地址
         const apiUrl = 'https://561e0a5c-7077-4921-979e-9efb33df850e.mock.pstmn.io/users';
 
         axios.get(apiUrl)
