@@ -106,6 +106,8 @@ color: #000;  // 默认字体颜色为黑色
   }
 `;
 
+
+
 const ChatWindow = () => {
     const [messages, setMessages] = useState([]);
     const [currentMessage, setCurrentMessage] = useState('');
@@ -113,9 +115,54 @@ const ChatWindow = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [currentUser, setCurrentUser] = useState({
-        id: 0,  // 假设当前登录用户的id为0
+        id: 1,  // 假设当前登录用户的id为0
         name: "You"
     });
+
+
+    //建立WebSocket连接：
+    const [ws, setWs] = useState(null);
+
+    useEffect(() => {
+        const socket = new WebSocket("ws://localhost:8080/api/chat/sendMessage");
+        socket.onopen = () => {
+            console.log("WebSocket Connected");
+        };
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.chatMessage) {
+                // 更新聊天记录
+                // setMessages(prevMessages => [...prevMessages, data.chatMessage]);
+            }
+        };
+        setWs(socket);
+
+        return () => {
+            if (socket) socket.close();
+        };
+    }, []);
+
+
+    //获取对话id
+    const [conversationId, setConversationId] = useState(null);
+
+    useEffect(() => {
+        axios
+            .get(`http://localhost:8080/api/chat/getConversationIdByUserIdentity`, {
+                params: {
+                    sender: "1",
+                    senderIdentity: "doctor",
+                    receiver: "1",
+                    receiverIdentity: "patient",
+                },
+            })
+            .then((response) => {
+                setConversationId(response.data.conversation_id);
+            })
+            .catch((error) => {
+                console.error("Error fetching conversation id:", error);
+            });
+    }, []);
 
 
 
@@ -148,21 +195,38 @@ const ChatWindow = () => {
             });
     }, []);  // 空依赖数组表示此useEffect只在组件挂载时运行一次
 
+    //获取聊天记录：
     useEffect(() => {
-        // 当选择了用户后，获取与该用户的聊天记录
-        if (selectedUser) {
-            console.log(selectedUser.id);
-            axios.get(`https://561e0a5c-7077-4921-979e-9efb33df850e.mock.pstmn.io/GET/chat/${selectedUser.id}/messages`)
-                .then(response => {
-                    console.log("Fetched messages for user:", response.data);  // 记录获取到的消息
+        if (conversationId) {
+            axios
+                .get(
+                    `http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`
+                )
+                .then((response) => {
                     setMessages(response.data);
+                })
+                .catch((error) => {
+                    console.error("Error fetching chat history:", error);
                 });
-        } else {
-            setMessages([]);  // 如果没有选择用户，清空消息
         }
-    }, [selectedUser]);
+    }, [conversationId]);
 
-    const handleSendMessage = () => {
+    // 发送消息
+    const sendMessage = (messageContent) => {
+        const payload = {
+            message: messageContent,
+            sender: "1", // 使用当前用户的ID
+            receiver: "1", // 使用接收者的ID
+            senderIdentity: "doctor",
+            receiverIdentity: "patient"
+        };
+        ws.send(JSON.stringify(payload));
+        setInput('');
+    };
+
+
+
+    /*const handleSendMessage = () => {
         // 使用 input 作为消息内容
         axios.post(`https://561e0a5c-7077-4921-979e-9efb33df850e.mock.pstmn.io/chat/${selectedUser.id}/messages`, { text: input })
             .then(response => {
@@ -177,7 +241,7 @@ const ChatWindow = () => {
                     setInput(''); // 清空输入框
                 }
             });
-    };
+    };*/
 
     return (
         <ChatWrapper>
