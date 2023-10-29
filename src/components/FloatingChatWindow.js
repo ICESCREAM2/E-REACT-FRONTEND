@@ -45,22 +45,24 @@ const FloatingChatWindow = () => {
                 setCurrentIdentity(response.data.identity);
                 console.log(currentIdentity);
             });
-
         // 根据身份获取用户列表
         if (currentIdentity === "doctor") {
-            axios.get('http://localhost:8080/api/chat/getDoctorChatList')
+            axios.get(`http://localhost:8080/api/chat/getPatientChatList?doctorId=25`)
                 .then(response => {
+                    alert(response.data);
                     setUserList(response.data);
+                    alert(userList);
                     console.log("User List: ", userList);
                 });
         } else if (currentIdentity === "patient") {
-            axios.get('http://localhost:8080/api/chat/getPatientChatList')
+            axios.get(`http://localhost:8080/api/chat/getPatientChatList?patientId=132`)
                 .then(response => {
                     setUserList(response.data);
+                    alert(userList);
                     console.log("User List: ", userList);
                 });
         }
-    });
+    },[]);
 
     const handleUserClick = (userId, userIdentity) => {
         setOtherSideId(userId);
