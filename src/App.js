@@ -21,6 +21,8 @@ import LabAdminRegistration from './screens/SignUp/LabAdminRegistration'
 import LabApp from './screens/SignUp/LabApp'
 import 'tachyons';
 import BreastCancerML from './screens/eir_breast_cancer_checker'
+import FloatingChatWindow from './components/FloatingChatWindow';
+
 
 
 const initialState = {
@@ -69,7 +71,9 @@ class App extends Component {
           <Route path="/HospitalAdminRegistration" element={<HospitalAdminRegistration loadUser={this.loadUser} />} />
           <Route path="/LabAdminRegistration" element={<LabAdminRegistration loadUser={this.loadUser} />} />
           <Route path="/LabApp" element={<LabApp />} />
+
         </Routes>
+        <FloatingChatWindow />
         <Footer />
       </BrowserRouter>
     );
