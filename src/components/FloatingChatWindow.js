@@ -41,7 +41,7 @@ const FloatingChatWindow = () => {
         // 获取当前用户的ID和身份
         axios.get('http://localhost:8080/api/chat/getCurrentId')
             .then(response => {
-                setCurrentId(response.data.info);
+                setCurrentId(response.data.info.id);
                 setCurrentIdentity(response.data.identity);
                 console.log(currentIdentity);
             });
@@ -60,7 +60,7 @@ const FloatingChatWindow = () => {
                     console.log("User List: ", userList);
                 });
         }
-    }, [currentIdentity]);
+    });
 
     const handleUserClick = (userId, userIdentity) => {
         setOtherSideId(userId);
