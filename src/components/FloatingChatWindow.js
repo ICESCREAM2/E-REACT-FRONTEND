@@ -38,34 +38,37 @@ const FloatingChatWindow = () => {
 
 
     useEffect(() => {
-        // 获取当前用户的ID和身份
-         axios.get('http://localhost:8080/api/chat/getCurrentId')
-            .then( (response) => {
-                setCurrentId((prevId)=>{return prevId-prevId+response.data.info.id});
-                setCurrentIdentity((prevIdentity)=>{return response.data.identity});
-                
-            });
-            console.log(currentId);
-        
-        // 根据身份获取用户列表
-        if (currentIdentity === "doctor") {
-            axios.get(`http://localhost:8080/api/chat/getPatientChatList?doctorId=25`)
-                .then(response => {
-                    console.log(response.data);
-                    setUserList(response.data);
-                    alert(userList);
-                    console.log("User List: ", userList);
-                });
-        } else if (currentIdentity === "patient") {
-            axios.get(`http://localhost:8080/api/chat/getPatientChatList?patientId=132`)
-                .then(response => {
-                    console.log(response.data);
-                    setUserList(response.data);
-                    alert(userList);
-                    console.log("User List: ", userList);
-                });
-        }
-    },[]);
+        const fetchData = async () => {
+            try {
+                // 获取当前用户的ID和身份
+                const response = await axios.get('http://localhost:8080/api/chat/getCurrentId');
+                let C_ID = response.data.info.id;
+                let C_IDENTITY = response.data.identity;
+                setCurrentId(response.data.info.id);
+                setCurrentIdentity(response.data.identity);
+
+
+                // 根据身份获取用户列表
+                let userListResponse;
+                if (response.data.identity === "doctor") {
+                    userListResponse = await axios.get(`http://localhost:8080/api/chat/getDoctorChatList?doctorId=${C_ID}`);
+                } else if (response.data.identity === "patient") {
+                    userListResponse = await axios.get(`http://localhost:8080/api/chat/getPatientChatList?patientId=${C_ID}`);
+                }
+
+                if (userListResponse) {
+                    setUserList(userListResponse.data);
+                    // alert(userListResponse.data);
+                    console.log("User List: ", userListResponse.data);
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
 
     const handleUserClick = (userId, userIdentity) => {
         setOtherSideId(userId);
@@ -83,7 +86,9 @@ const FloatingChatWindow = () => {
 
                 if (conversationId) {
                     // 如果有conversationId，则获取相应的聊天历史记录
-                    return axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`);
+                    let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`);
+                    console.log(CH_history);
+                    return CH_history;
                 }
                 return null;
             })
@@ -118,9 +123,9 @@ const FloatingChatWindow = () => {
             {isChatOpen && (
                 <div className="chat-container">
                     <div className="user-list">
-                        {userList.map(user => (
+                        {userList && userList.map(user => (
                             <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id, user.identity)}>
-                                {user.name}
+                                {user.FName}
                             </div>
                         ))}
                     </div>
