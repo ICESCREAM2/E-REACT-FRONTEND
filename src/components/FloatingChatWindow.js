@@ -6,7 +6,7 @@ import axios from 'axios';
 
 
 const FloatingChatWindow = () => {
-    const [currentId, setCurrentId] = useState(null);
+    const [currentId, setCurrentId] = useState(0);
     const [currentIdentity, setCurrentIdentity] = useState(null);
     const [otherSideId, setOtherSideId] = useState(null);
     const [otherSideIdentity, setOtherSideIdentity] = useState(null);
@@ -117,7 +117,7 @@ const FloatingChatWindow = () => {
                     <div className="user-list">
                         {userList && userList.map(user => (
                             <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id, user.identity)}>
-                                {user.FName}
+                                {user.FName?user.FName:user.Fname}
                             </div>
                         ))}
                     </div>
