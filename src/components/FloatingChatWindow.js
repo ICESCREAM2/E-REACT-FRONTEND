@@ -16,28 +16,14 @@ const FloatingChatWindow = () => {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const ws = new WebSocket('ws://localhost:8080/api/chat/');
 
-    // useEffect(() => {
-    //     fetch('http://localhost:8080/api/chat/getCurrentId')
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             setCurrentId(data.currentId);
-    //             setCurrentIdentity(data.currentIdentity);
-    //         });
-
-    //     // Define WebSocket message event
-    //     // ws.onmessage = (event) => {
-    //     //     const parsedMessage = JSON.parse(event.data);
-    //     //     setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
-    //     // };
-
-    //     // // Close WebSocket connection on component unmount
-    //     // return () => {
-    //     //     ws.close();
-    //     // };
-    // }, []);
-
-
     useEffect(() => {
+        //Define WebSocket message event
+        ws.onmessage = (event) => {
+            const parsedMessage = JSON.parse(event.data);
+            setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
+        };
+
+
         const fetchData = async () => {
             try {
                 // 获取当前用户的ID和身份
@@ -67,6 +53,12 @@ const FloatingChatWindow = () => {
         };
 
         fetchData();
+
+        // Close WebSocket connection on component unmount
+        return () => {
+            ws.close();
+        };
+
     }, []);
 
 
