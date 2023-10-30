@@ -38,29 +38,35 @@ const FloatingChatWindow = () => {
 
 
     useEffect(() => {
-        // 获取当前用户的ID和身份
-        axios.get('http://localhost:8080/api/chat/getCurrentId')
-            .then(response => {
+        const fetchData = async () => {
+            try {
+                // 获取当前用户的ID和身份
+                const response = await axios.get('http://localhost:8080/api/chat/getCurrentId');
                 setCurrentId(response.data.info.id);
                 setCurrentIdentity(response.data.identity);
-                console.log(currentIdentity);
-            });
+                alert(currentId);
 
-        // 根据身份获取用户列表
-        if (currentIdentity === "doctor") {
-            axios.get('http://localhost:8080/api/chat/getDoctorChatList')
-                .then(response => {
-                    setUserList(response.data);
-                    console.log("User List: ", userList);
-                });
-        } else if (currentIdentity === "patient") {
-            axios.get('http://localhost:8080/api/chat/getPatientChatList')
-                .then(response => {
-                    setUserList(response.data);
-                    console.log("User List: ", userList);
-                });
-        }
-    });
+                // 根据身份获取用户列表
+                let userListResponse;
+                if (response.data.identity === "doctor") {
+                    userListResponse = await axios.get(`http://localhost:8080/api/chat/getDoctorChatList?doctorId=${currentId}`);
+                } else if (response.data.identity === "patient") {
+                    userListResponse = await axios.get(`http://localhost:8080/api/chat/getPatientChatList?patientId=${currentId}`);
+                }
+
+                if (userListResponse) {
+                    setUserList(userListResponse.data);
+                    // alert(userListResponse.data);
+                    console.log("User List: ", userListResponse.data);
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
 
     const handleUserClick = (userId, userIdentity) => {
         setOtherSideId(userId);
@@ -113,7 +119,7 @@ const FloatingChatWindow = () => {
             {isChatOpen && (
                 <div className="chat-container">
                     <div className="user-list">
-                        {userList.map(user => (
+                        {userList && userList.map(user => (
                             <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id, user.identity)}>
                                 {user.name}
                             </div>
