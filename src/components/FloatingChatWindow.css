@@ -3,7 +3,7 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 320px;
+    width: 420px;
   }
   
  button {
@@ -20,6 +20,7 @@
   }
   
   .chat-container {
+    display: flex;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background-color: #ffffff;
@@ -28,10 +29,12 @@
   }
   
   .user-list {
-    max-height: 150px;
-    overflow-y: scroll;
-    border-bottom: 1px solid #e0e0e0;
-  }
+    max-height: 300px;
+    width: 250px;  
+    padding: 10px;
+    border-right: 1px solid #ccc;  
+    overflow-y: auto;  
+}
   
   .user-item {
     padding: 8px 12px;
@@ -45,7 +48,7 @@
   }
   
   .chat-box {
-    height: 250px;
+    height: 300px;
     display: flex;
     flex-direction: column;
   }
