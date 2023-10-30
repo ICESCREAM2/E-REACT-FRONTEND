@@ -125,7 +125,7 @@ const FloatingChatWindow = () => {
                     <div className="user-list">
                         {userList && userList.map(user => (
                             <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id, user.identity)}>
-                                {user.FName}
+                                {user.FName?user.FName:user.Fname}
                             </div>
                         ))}
                     </div>
