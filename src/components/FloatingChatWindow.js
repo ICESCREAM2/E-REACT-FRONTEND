@@ -14,14 +14,10 @@ const FloatingChatWindow = () => {
     const [userList, setUserList] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
     const [isChatOpen, setIsChatOpen] = useState(false);
-    const ws = new WebSocket('ws://localhost:8080/api/chat/');
+    const ws = useRef(null);
 
     useEffect(() => {
         //Define WebSocket message event
-        ws.onmessage = (event) => {
-            const parsedMessage = JSON.parse(event.data);
-            setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
-        };
 
 
         const fetchData = async () => {
@@ -54,9 +50,19 @@ const FloatingChatWindow = () => {
 
         fetchData();
 
-        // Close WebSocket connection on component unmount
+        ws.current = new WebSocket('ws://localhost:8080/api/chat/');
+
+        ws.current.onopen = () => {
+            console.log("WebSocket connection opened");
+        };
+
+
+        ws.current.onclose = () => {
+            console.log("WebSocket connection closed");
+        };
+
         return () => {
-            ws.close();
+            if (ws.current) ws.current.close();
         };
 
     }, []);
@@ -117,7 +123,7 @@ const FloatingChatWindow = () => {
                     <div className="user-list">
                         {userList && userList.map(user => (
                             <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id, user.identity)}>
-                                {user.FName?user.FName:user.Fname}
+                                {user.FName ? user.FName : user.Fname}
                             </div>
                         ))}
                     </div>
