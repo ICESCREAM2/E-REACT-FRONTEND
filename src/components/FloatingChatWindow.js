@@ -6,7 +6,7 @@ import axios from 'axios';
 
 
 const FloatingChatWindow = () => {
-    const [currentId, setCurrentId] = useState(null);
+    const [currentId, setCurrentId] = useState(0);
     const [currentIdentity, setCurrentIdentity] = useState(null);
     const [otherSideId, setOtherSideId] = useState(null);
     const [otherSideIdentity, setOtherSideIdentity] = useState(null);
@@ -39,17 +39,19 @@ const FloatingChatWindow = () => {
 
     useEffect(() => {
         // 获取当前用户的ID和身份
-        axios.get('http://localhost:8080/api/chat/getCurrentId')
-            .then(response => {
-                setCurrentId(response.data.info.id);
-                setCurrentIdentity(response.data.identity);
-                console.log(currentIdentity);
+         axios.get('http://localhost:8080/api/chat/getCurrentId')
+            .then( (response) => {
+                setCurrentId((prevId)=>{return prevId-prevId+response.data.info.id});
+                setCurrentIdentity((prevIdentity)=>{return response.data.identity});
+                
             });
+            console.log(currentId);
+        
         // 根据身份获取用户列表
         if (currentIdentity === "doctor") {
             axios.get(`http://localhost:8080/api/chat/getPatientChatList?doctorId=25`)
                 .then(response => {
-                    alert(response.data);
+                    console.log(response.data);
                     setUserList(response.data);
                     alert(userList);
                     console.log("User List: ", userList);
@@ -57,6 +59,7 @@ const FloatingChatWindow = () => {
         } else if (currentIdentity === "patient") {
             axios.get(`http://localhost:8080/api/chat/getPatientChatList?patientId=132`)
                 .then(response => {
+                    console.log(response.data);
                     setUserList(response.data);
                     alert(userList);
                     console.log("User List: ", userList);
