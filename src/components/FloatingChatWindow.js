@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './FloatingChatWindow.css';
 import axios from 'axios';
 
@@ -50,7 +50,7 @@ const FloatingChatWindow = () => {
 
         fetchData();
 
-        ws.current = new WebSocket('ws://localhost:8080/api/chat/');
+        ws.current = new WebSocket('ws://localhost:8080/api/chat/sendMessage');
 
         ws.current.onopen = () => {
             console.log("WebSocket connection opened");
@@ -61,9 +61,9 @@ const FloatingChatWindow = () => {
             console.log("WebSocket connection closed");
         };
 
-        return () => {
-            if (ws.current) ws.current.close();
-        };
+        // return () => {
+        //     if (ws.current) ws.current.close();
+        // };
 
     }, []);
 
@@ -110,7 +110,8 @@ const FloatingChatWindow = () => {
                 senderIdentity: currentIdentity,
                 receiverIdentity: otherSideIdentity,
             };
-            ws.send(JSON.stringify(message));
+            console.log(message);
+            ws.current.send(JSON.stringify(message));
             setInputMessage("");  // Clear the input field after sending
         }
     };
