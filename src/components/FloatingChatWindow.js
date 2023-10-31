@@ -41,7 +41,7 @@ const FloatingChatWindow = () => {
                 if (userListResponse) {
                     setUserList(userListResponse.data);
                     // alert(userListResponse.data);
-                    console.log("User List: ", userListResponse.data);
+                    //console.log("User List: ", userListResponse.data);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -82,10 +82,13 @@ const FloatingChatWindow = () => {
 
         // 发送请求以获取conversationId
         axios.post('http://localhost:8080/api/chat/getConversationIdByUserIdentity', {
-            sender: currentId,
-            senderIdentity: currentIdentity,
-            receiver: userId,
-            receiverIdentity: osIdentity
+            params: {
+                sender: currentId,
+                senderIdentity: currentIdentity,
+                receiver: userId,
+                receiverIdentity: osIdentity
+            }
+
         })
             .then(response => {
                 const { conversationId } = response.data;
