@@ -56,6 +56,10 @@ const FloatingChatWindow = () => {
             console.log("WebSocket connection opened");
         };
 
+        ws.onmessage = (event) => {
+            const parsedMessage = JSON.parse(event.data);
+            setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
+        };
 
         ws.current.onclose = () => {
             console.log("WebSocket connection closed");
@@ -70,6 +74,7 @@ const FloatingChatWindow = () => {
 
     const handleUserClick = (userId) => {
         setOtherSideId(userId);
+        setChatHistory([]); //make sure other user can't look guys history
         let osIdentity;
         if (currentIdentity == "patient") {
             osIdentity = "doctor"
@@ -113,6 +118,7 @@ const FloatingChatWindow = () => {
 
 
     const handleSendMessage = () => {
+
         if (inputMessage) {
             const message = {
                 message: inputMessage,
@@ -123,6 +129,8 @@ const FloatingChatWindow = () => {
             };
             console.log(message);
             ws.current.send(JSON.stringify(message));
+            setChatHistory(prevHistory => [...prevHistory, message]);
+
             setInputMessage("");  // Clear the input field after sending
         }
     };
@@ -142,7 +150,7 @@ const FloatingChatWindow = () => {
                     <div className="chat-box">
                         <div className="chat-history">
                             {chatHistory.map(chatMessage => (
-                                <div key={chatMessage.conversationIdid} className={chatMessage.sender === currentId && chatMessage.senderIdentity === currentIdentity ? 'chat-right' : 'chat-left'}>
+                                <div key={chatMessage.conversation_id} className={chatMessage.sender != currentId && chatMessage.sender_identity != currentIdentity ? 'chat-left' : 'chat-right'}>
                                     {chatMessage.message}
                                 </div>
 

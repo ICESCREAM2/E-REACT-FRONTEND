@@ -60,18 +60,23 @@
   }
   
   .chat-left, .chat-right {
-    margin: 8px 0;
-    padding: 5px 8px;
-    border-radius: 8px;
+    display: inline-block;  /* 使其成为行内块元素以适应内容宽度 */
+    max-width: 200px;      /* 限制最大宽度 */
+    min-width: 80px;
+    word-wrap: break-word; /* 如果文字超出了最大宽度，则断行 */
+    padding: 5px 10px;     /* 添加一些填充以美化消息 */
+    border-radius: 5px;    /* 为消息添加圆角 */
+    margin: 5px 0;
+    clear: both; /* 确保消息不在同一行显示 */
   }
   
   .chat-left {
-    align-self: flex-start;
+    float: left;        
     background-color: #e0e0e0;
   }
   
   .chat-right {
-    align-self: flex-end;
+    float: right;        
     background-color: #007BFF;
     color: white;
   }
