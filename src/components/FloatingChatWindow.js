@@ -81,7 +81,7 @@ const FloatingChatWindow = () => {
 
 
         // 发送请求以获取conversationId
-        axios.post('http://localhost:8080/api/chat/getConversationIdByUserIdentity', {
+        axios.get('http://localhost:8080/api/chat/getConversationIdByUserIdentity', {
             params: {
                 sender: currentId,
                 senderIdentity: currentIdentity,
@@ -91,12 +91,11 @@ const FloatingChatWindow = () => {
 
         })
             .then(response => {
-                const { conversationId } = response.data;
+                const conversationId = response.data.conversation_id;
 
                 if (conversationId) {
-                    // 如果有conversationId，则获取相应的聊天历史记录
-                    //let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`);
-                    let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=acbbbdf6-88a7-46a9-8635-c527c54c06b2`);
+                    //如果有conversationId，则获取相应的聊天历史记录
+                    let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`);
                     console.log(CH_history);
                     return CH_history;
                 }
@@ -143,12 +142,10 @@ const FloatingChatWindow = () => {
                     <div className="chat-box">
                         <div className="chat-history">
                             {chatHistory.map(chatMessage => (
-                                // <div key={chatMessage.conversationIdid} className={chatMessage.sender === currentId && chatMessage.senderIdentity === currentIdentity ? 'chat-right' : 'chat-left'}>
-                                //     {chatMessage.message}
-                                // </div>
-                                <div key={chatMessage.conversation_id} className={chatMessage.sender === 25 && chatMessage.sender_identity === "patient" ? 'chat-right' : 'chat-left'}>
+                                <div key={chatMessage.conversationIdid} className={chatMessage.sender === currentId && chatMessage.senderIdentity === currentIdentity ? 'chat-right' : 'chat-left'}>
                                     {chatMessage.message}
                                 </div>
+
                             ))}
                         </div>
                         <div className="chat-input">
