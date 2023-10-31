@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './FloatingChatWindow.css';
 import axios from 'axios';
 
@@ -50,7 +50,7 @@ const FloatingChatWindow = () => {
 
         fetchData();
 
-        ws.current = new WebSocket('ws://localhost:8080/api/chat/');
+        ws.current = new WebSocket('ws://localhost:8080/api/chat/sendMessage');
 
         ws.current.onopen = () => {
             console.log("WebSocket connection opened");
@@ -68,23 +68,32 @@ const FloatingChatWindow = () => {
     }, []);
 
 
-    const handleUserClick = (userId, userIdentity) => {
+    const handleUserClick = (userId) => {
         setOtherSideId(userId);
-        setOtherSideIdentity(userIdentity);
+        let osIdentity;
+        if (currentIdentity == "patient") {
+            osIdentity = "doctor"
+            setOtherSideIdentity(osIdentity);
+        } else {
+            osIdentity = "patient"
+            setOtherSideIdentity(osIdentity);
+        }
+
 
         // 发送请求以获取conversationId
         axios.post('http://localhost:8080/api/chat/getConversationIdByUserIdentity', {
             sender: currentId,
             senderIdentity: currentIdentity,
             receiver: userId,
-            receiverIdentity: userIdentity
+            receiverIdentity: osIdentity
         })
             .then(response => {
                 const { conversationId } = response.data;
 
                 if (conversationId) {
                     // 如果有conversationId，则获取相应的聊天历史记录
-                    let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`);
+                    //let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=${conversationId}`);
+                    let CH_history = axios.get(`http://localhost:8080/api/chat/getChatHistoryByConversationId?conversationId=acbbbdf6-88a7-46a9-8635-c527c54c06b2`);
                     console.log(CH_history);
                     return CH_history;
                 }
@@ -122,7 +131,7 @@ const FloatingChatWindow = () => {
                 <div className="chat-container">
                     <div className="user-list">
                         {userList && userList.map(user => (
-                            <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id, user.identity)}>
+                            <div key={user.id} className="user-item" onClick={() => handleUserClick(user.id)}>
                                 {user.FName ? user.FName : user.Fname}
                             </div>
                         ))}
@@ -130,7 +139,10 @@ const FloatingChatWindow = () => {
                     <div className="chat-box">
                         <div className="chat-history">
                             {chatHistory.map(chatMessage => (
-                                <div key={chatMessage.id} className={chatMessage.sender === currentId && chatMessage.senderIdentity === currentIdentity ? 'chat-right' : 'chat-left'}>
+                                // <div key={chatMessage.conversationIdid} className={chatMessage.sender === currentId && chatMessage.senderIdentity === currentIdentity ? 'chat-right' : 'chat-left'}>
+                                //     {chatMessage.message}
+                                // </div>
+                                <div key={chatMessage.conversation_id} className={chatMessage.sender === 25 && chatMessage.sender_identity === "patient" ? 'chat-right' : 'chat-left'}>
                                     {chatMessage.message}
                                 </div>
                             ))}
