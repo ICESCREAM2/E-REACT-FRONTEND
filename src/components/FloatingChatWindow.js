@@ -61,9 +61,9 @@ const FloatingChatWindow = () => {
             console.log("WebSocket connection closed");
         };
 
-        return () => {
-            if (ws.current) ws.current.close();
-        };
+        // return () => {
+        //     if (ws.current) ws.current.close();
+        // };
 
     }, []);
 
@@ -119,7 +119,8 @@ const FloatingChatWindow = () => {
                 senderIdentity: currentIdentity,
                 receiverIdentity: otherSideIdentity,
             };
-            ws.send(JSON.stringify(message));
+            console.log(message);
+            ws.current.send(JSON.stringify(message));
             setInputMessage("");  // Clear the input field after sending
         }
     };
