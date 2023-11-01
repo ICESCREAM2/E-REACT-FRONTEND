@@ -56,9 +56,10 @@ const FloatingChatWindow = () => {
             console.log("WebSocket connection opened");
         };
 
-        ws.onmessage = (event) => {
+        ws.current.onmessage = (event) => {
             const parsedMessage = JSON.parse(event.data);
-            setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
+            if (currentId == parsedMessage.receiver && currentIdentity == parsedMessage.receiverIdentity)
+                setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
         };
 
         ws.current.onclose = () => {
@@ -150,7 +151,7 @@ const FloatingChatWindow = () => {
                     <div className="chat-box">
                         <div className="chat-history">
                             {chatHistory.map(chatMessage => (
-                                <div key={chatMessage.conversation_id} className={chatMessage.sender != currentId && chatMessage.sender_identity != currentIdentity ? 'chat-left' : 'chat-right'}>
+                                <div className={chatMessage.sender != currentId && chatMessage.sender_identity != currentIdentity ? 'chat-left' : 'chat-right'}>
                                     {chatMessage.message}
                                 </div>
 
