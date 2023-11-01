@@ -58,7 +58,10 @@ const FloatingChatWindow = () => {
 
         ws.current.onmessage = (event) => {
             const parsedMessage = JSON.parse(event.data);
-            setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
+            if (C_ID === parsedMessage.chatMessage.receiver && C_IDENTITY === parsedMessage.chatMessage.receiverIdentity) {
+                setChatHistory(prevHistory => parsedMessage.chatMessage.message && [...prevHistory, parsedMessage.chatMessage]);
+            }
+
         };
 
         ws.current.onclose = () => {
