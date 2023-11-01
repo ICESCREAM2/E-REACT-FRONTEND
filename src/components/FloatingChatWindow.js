@@ -15,17 +15,17 @@ const FloatingChatWindow = () => {
     const [inputMessage, setInputMessage] = useState("");
     const [isChatOpen, setIsChatOpen] = useState(false);
     const ws = useRef(null);
+    let C_ID = null;
+    let C_IDENTITY = null;
 
     useEffect(() => {
         //Define WebSocket message event
-
-
         const fetchData = async () => {
             try {
                 // 获取当前用户的ID和身份
                 const response = await axios.get('http://localhost:8080/api/chat/getCurrentId');
-                let C_ID = response.data.info.id;
-                let C_IDENTITY = response.data.identity;
+                C_ID = response.data.info.id;
+                C_IDENTITY = response.data.identity;
                 setCurrentId(response.data.info.id);
                 setCurrentIdentity(response.data.identity);
 
@@ -56,9 +56,12 @@ const FloatingChatWindow = () => {
             console.log("WebSocket connection opened");
         };
 
-        ws.onmessage = (event) => {
+        ws.current.onmessage  = (event) => {
             const parsedMessage = JSON.parse(event.data);
-            setChatHistory(prevHistory => [...prevHistory, parsedMessage]);
+            if (C_ID === parsedMessage.chatMessage.receiver && C_IDENTITY === parsedMessage.chatMessage.receiverIdentity){
+                setChatHistory(prevHistory => parsedMessage.chatMessage.message&&[...prevHistory, parsedMessage.chatMessage]);
+            }
+            
         };
 
         ws.current.onclose = () => {
@@ -150,7 +153,7 @@ const FloatingChatWindow = () => {
                     <div className="chat-box">
                         <div className="chat-history">
                             {chatHistory.map(chatMessage => (
-                                <div key={chatMessage.conversation_id} className={chatMessage.sender != currentId && chatMessage.sender_identity != currentIdentity ? 'chat-left' : 'chat-right'}>
+                                <div className={chatMessage.sender != currentId && chatMessage.sender_identity != currentIdentity ? 'chat-left' : 'chat-right'}>
                                     {chatMessage.message}
                                 </div>
 
